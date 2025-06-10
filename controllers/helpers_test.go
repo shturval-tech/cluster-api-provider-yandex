@@ -945,7 +945,7 @@ func (c *ClusterTestEnv) setNewYandexMachineReconcileMocks(address string) {
 	)
 }
 
-// setNewYandexMachineWithReconcileMocks mocks the YandexClient API calls on YandexMachine reconciliation with API errors.
+// setNewYandexMachineErrorReconcileMocks mocks the YandexClient API calls on YandexMachine reconciliation with API errors.
 func (c *ClusterTestEnv) setNewYandexMachineErrorReconcileMocks() {
 	const mockID string = "123"
 
@@ -979,6 +979,31 @@ func (c *ClusterTestEnv) setNewYandexMachineErrorReconcileMocks() {
 					map[string]interface{}{"id": id},
 					[]interface{}{instance, nil})
 				return instance, nil
+			}),
+	)
+}
+
+// setYandexMachineNotFoundReconcileMocks mocks the YandexClient API calls on YandexMachine reconciliation with NotFound API error.
+func (c *ClusterTestEnv) setYandexMachineNotFoundReconcileMocks() {
+	const mockID string = "123"
+	notFoundError := status.Error(codes.NotFound, "instance not found")
+
+	gomock.InOrder(
+		e.mockClient.EXPECT().ComputeCreate(gomock.Any(), gomock.Any()).
+			DoAndReturn(func(_ context.Context, req *compute.CreateInstanceRequest) (string, error) {
+				logFunctionCalls(
+					"ComputeCreate",
+					map[string]interface{}{"request": req},
+					[]interface{}{mockID, nil})
+				return mockID, nil
+			}),
+		e.mockClient.EXPECT().ComputeGet(gomock.Any(), mockID).
+			DoAndReturn(func(_ context.Context, id string) (*compute.Instance, error) {
+				logFunctionCalls(
+					"ComputeGet",
+					map[string]interface{}{"id": id},
+					[]interface{}{"", notFoundError})
+				return nil, notFoundError
 			}),
 	)
 }
@@ -1030,11 +1055,13 @@ func (c *ClusterTestEnv) setNewCPYandexMachineReconcileMocks(address, targetGrou
 			}),
 		e.mockClient.EXPECT().ALBAddTarget(gomock.Any(), &alb.AddTargetsRequest{
 			TargetGroupId: mockID,
-			Targets: []*alb.Target{{
-				SubnetId: "subnetid",
-				AddressType: &alb.Target_IpAddress{
-					IpAddress: address,
-				}},
+			Targets: []*alb.Target{
+				{
+					SubnetId: "subnetid",
+					AddressType: &alb.Target_IpAddress{
+						IpAddress: address,
+					},
+				},
 			},
 		}).DoAndReturn(func(_ context.Context, req *alb.AddTargetsRequest) (*operation.Operation, error) {
 			logFunctionCalls(
@@ -1043,6 +1070,50 @@ func (c *ClusterTestEnv) setNewCPYandexMachineReconcileMocks(address, targetGrou
 				[]interface{}{&operation.Operation{}, nil})
 			return &operation.Operation{}, nil
 		}),
+	)
+}
+
+// setNewCPYandexMachineWithoutTargetGroupErrorReconcileMocks mocks the YandexClient API calls on YandexMachine without TargetGroup with controlplane role reconciliation.
+func (c *ClusterTestEnv) setNewCPYandexMachineWithoutTargetGroupErrorReconcileMocks(address string) {
+	const mockID string = "123"
+
+	gomock.InOrder(
+		e.mockClient.EXPECT().ComputeCreate(gomock.Any(), gomock.Any()).
+			DoAndReturn(func(_ context.Context, req *compute.CreateInstanceRequest) (string, error) {
+				logFunctionCalls(
+					"ComputeCreate",
+					map[string]interface{}{"request": req},
+					[]interface{}{mockID, nil})
+				return mockID, nil
+			}),
+		e.mockClient.EXPECT().ComputeGet(gomock.Any(), mockID).
+			DoAndReturn(func(_ context.Context, id string) (*compute.Instance, error) {
+				instance := &compute.Instance{
+					Name:   c.machineName,
+					Id:     mockID,
+					Status: compute.Instance_RUNNING,
+					NetworkInterfaces: []*compute.NetworkInterface{
+						{
+							PrimaryV4Address: &compute.PrimaryAddress{
+								Address: address,
+							},
+						},
+					},
+				}
+				logFunctionCalls(
+					"ComputeGet",
+					map[string]interface{}{"id": id},
+					[]interface{}{instance, nil})
+				return instance, nil
+			}),
+		e.mockClient.EXPECT().ALBTargetGroupGetByName(gomock.Any(), gomock.Any(), gomock.Any()).
+			DoAndReturn(func(_ context.Context, name, zone string) (*alb.TargetGroup, error) {
+				logFunctionCalls(
+					"ALBTargetGroupGetByName",
+					map[string]interface{}{"name": name, "zone": zone},
+					[]interface{}{nil, nil})
+				return nil, nil
+			}),
 	)
 }
 
@@ -1093,11 +1164,13 @@ func (c *ClusterTestEnv) setNewCPYandexMachineErrorReconcileMocks(address, targe
 			}),
 		e.mockClient.EXPECT().ALBAddTarget(gomock.Any(), &alb.AddTargetsRequest{
 			TargetGroupId: mockID,
-			Targets: []*alb.Target{{
-				SubnetId: "subnetid",
-				AddressType: &alb.Target_IpAddress{
-					IpAddress: address,
-				}},
+			Targets: []*alb.Target{
+				{
+					SubnetId: "subnetid",
+					AddressType: &alb.Target_IpAddress{
+						IpAddress: address,
+					},
+				},
 			},
 		}).DoAndReturn(func(_ context.Context, req *alb.AddTargetsRequest) (*operation.Operation, error) {
 			err := fmt.Errorf("alb target group add error")
@@ -1141,11 +1214,13 @@ func (c *ClusterTestEnv) setNewCPYandexMachineErrorReconcileMocks(address, targe
 			}),
 		e.mockClient.EXPECT().ALBAddTarget(gomock.Any(), &alb.AddTargetsRequest{
 			TargetGroupId: mockID,
-			Targets: []*alb.Target{{
-				SubnetId: "subnetid",
-				AddressType: &alb.Target_IpAddress{
-					IpAddress: address,
-				}},
+			Targets: []*alb.Target{
+				{
+					SubnetId: "subnetid",
+					AddressType: &alb.Target_IpAddress{
+						IpAddress: address,
+					},
+				},
 			},
 		}).DoAndReturn(func(_ context.Context, req *alb.AddTargetsRequest) (*operation.Operation, error) {
 			logFunctionCalls(
@@ -1303,11 +1378,13 @@ func (c *ClusterTestEnv) setCPYandexMachineDeleteMocks(mockID, mockAddress strin
 			}),
 		e.mockClient.EXPECT().ALBRemoveTarget(gomock.Any(), &alb.RemoveTargetsRequest{
 			TargetGroupId: mockID,
-			Targets: []*alb.Target{{
-				SubnetId: "subnetid",
-				AddressType: &alb.Target_IpAddress{
-					IpAddress: mockAddress,
-				}},
+			Targets: []*alb.Target{
+				{
+					SubnetId: "subnetid",
+					AddressType: &alb.Target_IpAddress{
+						IpAddress: mockAddress,
+					},
+				},
 			},
 		}).DoAndReturn(func(_ context.Context, req *alb.RemoveTargetsRequest) (*operation.Operation, error) {
 			logFunctionCalls(
@@ -1366,11 +1443,13 @@ func (c *ClusterTestEnv) setCPYandexMachineDeleteMocks(mockID, mockAddress strin
 			}),
 		e.mockClient.EXPECT().ALBRemoveTarget(gomock.Any(), &alb.RemoveTargetsRequest{
 			TargetGroupId: mockID,
-			Targets: []*alb.Target{{
-				SubnetId: "subnetid",
-				AddressType: &alb.Target_IpAddress{
-					IpAddress: mockAddress,
-				}},
+			Targets: []*alb.Target{
+				{
+					SubnetId: "subnetid",
+					AddressType: &alb.Target_IpAddress{
+						IpAddress: mockAddress,
+					},
+				},
 			},
 		}).DoAndReturn(func(_ context.Context, req *alb.RemoveTargetsRequest) (*operation.Operation, error) {
 			logFunctionCalls(
@@ -1379,5 +1458,80 @@ func (c *ClusterTestEnv) setCPYandexMachineDeleteMocks(mockID, mockAddress strin
 				[]interface{}{&operation.Operation{}, nil})
 			return &operation.Operation{}, nil
 		}),
+	)
+}
+
+// setCPYandexMachineWithoutTargetGroupDeleteMocks mocks the YandexClient API calls on control plane YandexMachine without target group delete.
+func (c *ClusterTestEnv) setCPYandexMachineWithoutTargetGroupDeleteMocks(mockID, mockAddress string) {
+	notFoundError := status.Error(codes.NotFound, "instance not found")
+
+	gomock.InOrder(
+		e.mockClient.EXPECT().ComputeGet(gomock.Any(), mockID).
+			DoAndReturn(func(_ context.Context, id string) (*compute.Instance, error) {
+				instance := &compute.Instance{
+					Name:   c.machineName,
+					Id:     mockID,
+					Status: compute.Instance_RUNNING,
+					NetworkInterfaces: []*compute.NetworkInterface{
+						{
+							PrimaryV4Address: &compute.PrimaryAddress{
+								Address: mockAddress,
+							},
+						},
+					},
+				}
+				logFunctionCalls(
+					"ComputeGet",
+					map[string]interface{}{"id": id},
+					[]interface{}{instance, nil})
+				return instance, nil
+			}),
+		e.mockClient.EXPECT().
+			ALBTargetGroupGetByName(gomock.Any(), gomock.Any(), gomock.Any()).
+			DoAndReturn(func(_ context.Context, name, zone string) (*alb.TargetGroup, error) {
+				logFunctionCalls(
+					"ALBTargetGroupGetByName",
+					map[string]interface{}{"name": name, "zone": zone},
+					[]interface{}{nil, nil})
+				return nil, nil
+			}),
+		e.mockClient.EXPECT().ComputeDelete(gomock.Any(), mockID).
+			DoAndReturn(func(_ context.Context, id string) error {
+				logFunctionCalls(
+					"ComputeDelete",
+					map[string]interface{}{"id": id},
+					[]interface{}{nil})
+				return nil
+			}),
+		e.mockClient.EXPECT().ComputeGet(gomock.Any(), mockID).
+			DoAndReturn(func(_ context.Context, id string) (*compute.Instance, error) {
+				instance := &compute.Instance{
+					Name:   c.machineName,
+					Id:     mockID,
+					Status: compute.Instance_DELETING,
+				}
+				logFunctionCalls(
+					"ComputeGet",
+					map[string]interface{}{"id": id},
+					[]interface{}{instance, nil})
+				return instance, nil
+			}),
+		e.mockClient.EXPECT().ComputeGet(gomock.Any(), mockID).
+			DoAndReturn(func(_ context.Context, id string) (*compute.Instance, error) {
+				logFunctionCalls(
+					"ComputeGet",
+					map[string]interface{}{"id": id},
+					[]interface{}{nil, notFoundError})
+				return nil, notFoundError
+			}),
+		e.mockClient.EXPECT().
+			ALBTargetGroupGetByName(gomock.Any(), gomock.Any(), gomock.Any()).
+			DoAndReturn(func(_ context.Context, name, zone string) (*alb.TargetGroup, error) {
+				logFunctionCalls(
+					"ALBTargetGroupGetByName",
+					map[string]interface{}{"name": name, "zone": zone},
+					[]interface{}{nil, nil})
+				return nil, nil
+			}),
 	)
 }

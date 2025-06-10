@@ -269,8 +269,8 @@ var _ = Describe("YandexMachine reconciliation check", func() {
 		addr := "1.2.3.4"
 		e.setNewCPYandexMachineWithoutTargetGroupErrorReconcileMocks(addr)
 		reconciler := &YandexMachineReconciler{
-			Client:       k8sClient,
-			YandexClient: e.mockClient,
+			Client:             k8sClient,
+			YandexClientGetter: e.mockClientGetter,
 		}
 
 		result, err := reconciler.Reconcile(ctx, e.getReconcileRequest(ym.Namespace, ym.Name))
@@ -300,8 +300,8 @@ var _ = Describe("YandexMachine reconciliation check", func() {
 		Expect(e.Create(ctx, ym)).To(Succeed())
 
 		reconciler := &YandexMachineReconciler{
-			Client:       k8sClient,
-			YandexClient: e.mockClient,
+			Client:             k8sClient,
+			YandexClientGetter: e.mockClientGetter,
 		}
 
 		e.setYandexMachineNotFoundReconcileMocks()
@@ -663,15 +663,15 @@ var _ = Describe("YandexMachine deletions checks", func() {
 		})
 
 		reconciler := &YandexMachineReconciler{
-			Client:       e.Client,
-			YandexClient: e.mockClient,
+			Client:             e.Client,
+			YandexClientGetter: e.mockClientGetter,
 		}
 
 		clusterScope, err := scope.NewClusterScope(ctx, scope.ClusterScopeParams{
-			Client:        e.Client,
-			Cluster:       e.getCAPIClusterWithInfrastructureReference(testNamespace.Name),
-			YandexCluster: e.getYandexClusterWithOwnerReference(testNamespace.Name),
-			YandexClient:  e.mockClient,
+			Client:             e.Client,
+			Cluster:            e.getCAPIClusterWithInfrastructureReference(testNamespace.Name),
+			YandexCluster:      e.getYandexClusterWithOwnerReference(testNamespace.Name),
+			YandexClientGetter: e.mockClientGetter,
 		})
 		Expect(err).NotTo(HaveOccurred())
 

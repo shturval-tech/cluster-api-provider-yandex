@@ -243,13 +243,13 @@ type YandexClusterList struct {
 }
 
 // GetConditions returns the list of conditions for an YandexCluster API object.
-func (yc *YandexCluster) GetConditions() clusterv1beta1.Conditions {
-	return yc.Status.Conditions
+func (c *YandexCluster) GetConditions() clusterv1beta1.Conditions {
+	return c.Status.Conditions
 }
 
 // SetConditions will set the given conditions on an YandexCluster API object.
-func (yc *YandexCluster) SetConditions(conditions clusterv1beta1.Conditions) {
-	yc.Status.Conditions = conditions
+func (c *YandexCluster) SetConditions(conditions clusterv1beta1.Conditions) {
+	c.Status.Conditions = conditions
 }
 
 func init() {

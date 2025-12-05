@@ -24,10 +24,9 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/validation/field"
-	clusterv1 "sigs.k8s.io/cluster-api/api/v1beta1"
+	clusterv1 "sigs.k8s.io/cluster-api/api/core/v1beta2"
 	ctrl "sigs.k8s.io/controller-runtime"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
-	"sigs.k8s.io/controller-runtime/pkg/webhook"
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 )
 
@@ -55,10 +54,10 @@ func (c *YandexCluster) SetupWebhookWithManager(mgr ctrl.Manager) error {
 //nolint:lll // controller-gen marker
 //+kubebuilder:webhook:verbs=create;update,path=/validate-infrastructure-cluster-x-k8s-io-v1alpha1-yandexcluster,mutating=false,failurePolicy=fail,matchPolicy=Equivalent,groups=infrastructure.cluster.x-k8s.io,resources=yandexclusters,versions=v1alpha1,name=validation.yandexclusters.infrastructure.cluster.x-k8s.io,sideEffects=None,admissionReviewVersions=v1beta1
 
-var (
-	_ webhook.Defaulter = &YandexCluster{}
-	_ webhook.Validator = &YandexCluster{}
-)
+// var (
+// 	_ webhook.Defaulter = &YandexCluster{}
+// 	_ webhook.Validator = &YandexCluster{}
+// )
 
 // Default implements webhook.Defaulter so a webhook will be registered for the type.
 func (c *YandexCluster) Default() {

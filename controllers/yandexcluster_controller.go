@@ -153,8 +153,8 @@ func (r *YandexClusterReconciler) reconcile(ctx context.Context, clusterScope *s
 
 	switch {
 	// The load balancer has been created.
-	case clusterScope.YandexCluster.Spec.ControlPlaneEndpoint.Host == "" && clusterScope.YandexCluster.Spec.ControlPlaneEndpoint.Port == 0:
-		clusterScope.YandexCluster.Spec.ControlPlaneEndpoint = clusterv1.APIEndpoint{
+	case clusterScope.YandexCluster.Spec.ControlPlaneEndpoint == nil || clusterScope.YandexCluster.Spec.ControlPlaneEndpoint.IsZero():
+		clusterScope.YandexCluster.Spec.ControlPlaneEndpoint = &clusterv1.APIEndpoint{
 			Host: state.ListenerAddress,
 			Port: state.ListenerPort,
 		}

@@ -83,8 +83,8 @@ func (c *YandexCluster) ValidateCreate() (admission.Warnings, error) {
 		)
 	}
 
-	if !reflect.DeepEqual(c.Spec.ControlPlaneEndpoint, clusterv1.APIEndpoint{}) {
-		allErrs = append(allErrs, isControlPlaneEndpointValid(c.Spec.ControlPlaneEndpoint)...)
+	if c.Spec.ControlPlaneEndpoint != nil && !c.Spec.ControlPlaneEndpoint.IsZero() {
+		allErrs = append(allErrs, isControlPlaneEndpointValid(*c.Spec.ControlPlaneEndpoint)...)
 	}
 
 	if len(allErrs) == 0 {
@@ -112,8 +112,10 @@ func (c *YandexCluster) ValidateUpdate(oldRaw runtime.Object) (admission.Warning
 	// We allow you to change the ControlPlaneEndpoint only if this field has not been set before.
 	// In all other cases, this field is immutable.
 	if !reflect.DeepEqual(c.Spec.ControlPlaneEndpoint, old.Spec.ControlPlaneEndpoint) {
-		if reflect.DeepEqual(old.Spec.ControlPlaneEndpoint, clusterv1.APIEndpoint{}) {
-			allErrs = append(allErrs, isControlPlaneEndpointValid(c.Spec.ControlPlaneEndpoint)...)
+		if old.Spec.ControlPlaneEndpoint == nil || old.Spec.ControlPlaneEndpoint.IsZero() {
+			if c.Spec.ControlPlaneEndpoint != nil {
+				allErrs = append(allErrs, isControlPlaneEndpointValid(*c.Spec.ControlPlaneEndpoint)...)
+			}
 		} else {
 			allErrs = append(allErrs,
 				field.Invalid(field.NewPath("spec", "controlPlaneEndpoint"), c.Spec.ControlPlaneEndpoint, "field is immutable"),

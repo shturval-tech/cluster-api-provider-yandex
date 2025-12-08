@@ -128,7 +128,10 @@ func (c *ClusterScope) GetLabels() infrav1.Labels {
 
 // ControlPlaneEndpoint gets the cluster API endpoit.
 func (c *ClusterScope) ControlPlaneEndpoint() clusterv1.APIEndpoint {
-	return c.YandexCluster.Spec.ControlPlaneEndpoint
+	if c.YandexCluster.Spec.ControlPlaneEndpoint == nil {
+		return clusterv1.APIEndpoint{}
+	}
+	return *c.YandexCluster.Spec.ControlPlaneEndpoint
 }
 
 // GetLBName returns the load balancer name.

@@ -35,7 +35,7 @@ func TestYandexCluster_ValidateCreate(t *testing.T) {
 			name: "YandexCluster with FQDN - valid",
 			YandexCluster: &infrav1.YandexCluster{
 				Spec: infrav1.YandexClusterSpec{
-					ControlPlaneEndpoint: &clusterv1.APIEndpoint{
+					ControlPlaneEndpoint: clusterv1.APIEndpoint{
 						Host: "ya.ru",
 						Port: 8443,
 					},
@@ -55,7 +55,7 @@ func TestYandexCluster_ValidateCreate(t *testing.T) {
 			name: "YandexCluster with IPv4 - valid",
 			YandexCluster: &infrav1.YandexCluster{
 				Spec: infrav1.YandexClusterSpec{
-					ControlPlaneEndpoint: &clusterv1.APIEndpoint{
+					ControlPlaneEndpoint: clusterv1.APIEndpoint{
 						Host: "10.10.10.10",
 						Port: 8443,
 					},
@@ -75,7 +75,7 @@ func TestYandexCluster_ValidateCreate(t *testing.T) {
 			name: "YandexCluster with incorrect port",
 			YandexCluster: &infrav1.YandexCluster{
 				Spec: infrav1.YandexClusterSpec{
-					ControlPlaneEndpoint: &clusterv1.APIEndpoint{
+					ControlPlaneEndpoint: clusterv1.APIEndpoint{
 						Host: "10.10.10.10",
 						Port: 844355,
 					},
@@ -95,7 +95,7 @@ func TestYandexCluster_ValidateCreate(t *testing.T) {
 			name: "YandexCluster with incorrect IPv4 endpoint",
 			YandexCluster: &infrav1.YandexCluster{
 				Spec: infrav1.YandexClusterSpec{
-					ControlPlaneEndpoint: &clusterv1.APIEndpoint{
+					ControlPlaneEndpoint: clusterv1.APIEndpoint{
 						Host: "1000.10.10.10",
 						Port: 8443,
 					},
@@ -115,7 +115,7 @@ func TestYandexCluster_ValidateCreate(t *testing.T) {
 			name: "YandexCluster with incorrect FQDN endpoint - 1",
 			YandexCluster: &infrav1.YandexCluster{
 				Spec: infrav1.YandexClusterSpec{
-					ControlPlaneEndpoint: &clusterv1.APIEndpoint{
+					ControlPlaneEndpoint: clusterv1.APIEndpoint{
 						Host: "yaru",
 						Port: 8443,
 					},
@@ -135,7 +135,7 @@ func TestYandexCluster_ValidateCreate(t *testing.T) {
 			name: "YandexCluster with incorrect FQDN endpoint - 2",
 			YandexCluster: &infrav1.YandexCluster{
 				Spec: infrav1.YandexClusterSpec{
-					ControlPlaneEndpoint: &clusterv1.APIEndpoint{
+					ControlPlaneEndpoint: clusterv1.APIEndpoint{
 						Host: "yaru.",
 						Port: 8443,
 					},
@@ -156,7 +156,7 @@ func TestYandexCluster_ValidateCreate(t *testing.T) {
 			name: "YandexCluster with incorrect IPv6 - 1",
 			YandexCluster: &infrav1.YandexCluster{
 				Spec: infrav1.YandexClusterSpec{
-					ControlPlaneEndpoint: &clusterv1.APIEndpoint{
+					ControlPlaneEndpoint: clusterv1.APIEndpoint{
 						Host: "2a02:6b8:a::a",
 						Port: 8443,
 					},
@@ -176,7 +176,7 @@ func TestYandexCluster_ValidateCreate(t *testing.T) {
 			name: "YandexCluster with incorrect IPv6 - 2",
 			YandexCluster: &infrav1.YandexCluster{
 				Spec: infrav1.YandexClusterSpec{
-					ControlPlaneEndpoint: &clusterv1.APIEndpoint{
+					ControlPlaneEndpoint: clusterv1.APIEndpoint{
 						Host: "2a02:06b8:000a:0000:0000:0000:0000:000a",
 						Port: 8443,
 					},
@@ -196,7 +196,7 @@ func TestYandexCluster_ValidateCreate(t *testing.T) {
 			name: "YandexCluster with empty host endpoint",
 			YandexCluster: &infrav1.YandexCluster{
 				Spec: infrav1.YandexClusterSpec{
-					ControlPlaneEndpoint: &clusterv1.APIEndpoint{
+					ControlPlaneEndpoint: clusterv1.APIEndpoint{
 						Host: "",
 						Port: 8443,
 					},
@@ -216,7 +216,7 @@ func TestYandexCluster_ValidateCreate(t *testing.T) {
 			name: "YandexCluster with empty port endpoint",
 			YandexCluster: &infrav1.YandexCluster{
 				Spec: infrav1.YandexClusterSpec{
-					ControlPlaneEndpoint: &clusterv1.APIEndpoint{
+					ControlPlaneEndpoint: clusterv1.APIEndpoint{
 						Host: "ya.ru",
 						Port: 0,
 					},
@@ -367,7 +367,7 @@ func TestYandexCluster_ValidateUpdate(t *testing.T) {
 			name: "YandexCluster with no changes in immutable fields",
 			newTemplate: &infrav1.YandexCluster{
 				Spec: infrav1.YandexClusterSpec{
-					ControlPlaneEndpoint: &clusterv1.APIEndpoint{
+					ControlPlaneEndpoint: clusterv1.APIEndpoint{
 						Host: "ya.ru",
 						Port: 8443,
 					},
@@ -375,7 +375,7 @@ func TestYandexCluster_ValidateUpdate(t *testing.T) {
 			},
 			oldTemplate: &infrav1.YandexCluster{
 				Spec: infrav1.YandexClusterSpec{
-					ControlPlaneEndpoint: &clusterv1.APIEndpoint{
+					ControlPlaneEndpoint: clusterv1.APIEndpoint{
 						Host: "ya.ru",
 						Port: 8443,
 					},
@@ -449,7 +449,7 @@ func TestYandexCluster_ValidateUpdate(t *testing.T) {
 			name: "YandexCluster with changes in empty field controlPlaneEndpoint",
 			newTemplate: &infrav1.YandexCluster{
 				Spec: infrav1.YandexClusterSpec{
-					ControlPlaneEndpoint: &clusterv1.APIEndpoint{
+					ControlPlaneEndpoint: clusterv1.APIEndpoint{
 						Host: "ya.ru",
 						Port: 8443,
 					},
@@ -464,7 +464,7 @@ func TestYandexCluster_ValidateUpdate(t *testing.T) {
 			name: "YandexCluster change empty host to incorrect IPv4",
 			newTemplate: &infrav1.YandexCluster{
 				Spec: infrav1.YandexClusterSpec{
-					ControlPlaneEndpoint: &clusterv1.APIEndpoint{
+					ControlPlaneEndpoint: clusterv1.APIEndpoint{
 						Host: "1000.10.10.10",
 						Port: 8443,
 					},
@@ -479,7 +479,7 @@ func TestYandexCluster_ValidateUpdate(t *testing.T) {
 			name: "YandexCluster change empty host to incorrect IPv6",
 			newTemplate: &infrav1.YandexCluster{
 				Spec: infrav1.YandexClusterSpec{
-					ControlPlaneEndpoint: &clusterv1.APIEndpoint{
+					ControlPlaneEndpoint: clusterv1.APIEndpoint{
 						Host: "2a02:6b8:a::a",
 						Port: 8443,
 					},
@@ -494,7 +494,7 @@ func TestYandexCluster_ValidateUpdate(t *testing.T) {
 			name: "YandexCluster change empty host to incorrect FQDN",
 			newTemplate: &infrav1.YandexCluster{
 				Spec: infrav1.YandexClusterSpec{
-					ControlPlaneEndpoint: &clusterv1.APIEndpoint{
+					ControlPlaneEndpoint: clusterv1.APIEndpoint{
 						Host: "yaru",
 						Port: 8443,
 					},
@@ -509,7 +509,7 @@ func TestYandexCluster_ValidateUpdate(t *testing.T) {
 			name: "YandexCluster change empty host to incorrect port",
 			newTemplate: &infrav1.YandexCluster{
 				Spec: infrav1.YandexClusterSpec{
-					ControlPlaneEndpoint: &clusterv1.APIEndpoint{
+					ControlPlaneEndpoint: clusterv1.APIEndpoint{
 						Host: "ya.ru",
 						Port: 844355,
 					},
@@ -524,7 +524,7 @@ func TestYandexCluster_ValidateUpdate(t *testing.T) {
 			name: "YandexCluster with changes in non empty field controlPlaneEndpoint",
 			newTemplate: &infrav1.YandexCluster{
 				Spec: infrav1.YandexClusterSpec{
-					ControlPlaneEndpoint: &clusterv1.APIEndpoint{
+					ControlPlaneEndpoint: clusterv1.APIEndpoint{
 						Host: "ya.ru",
 						Port: 8443,
 					},
@@ -532,7 +532,7 @@ func TestYandexCluster_ValidateUpdate(t *testing.T) {
 			},
 			oldTemplate: &infrav1.YandexCluster{
 				Spec: infrav1.YandexClusterSpec{
-					ControlPlaneEndpoint: &clusterv1.APIEndpoint{
+					ControlPlaneEndpoint: clusterv1.APIEndpoint{
 						Host: "yandex.com",
 						Port: 8444,
 					},
@@ -544,12 +544,12 @@ func TestYandexCluster_ValidateUpdate(t *testing.T) {
 			name: "YandexCluster with empty update",
 			newTemplate: &infrav1.YandexCluster{
 				Spec: infrav1.YandexClusterSpec{
-					ControlPlaneEndpoint: &clusterv1.APIEndpoint{},
+					ControlPlaneEndpoint: clusterv1.APIEndpoint{},
 				},
 			},
 			oldTemplate: &infrav1.YandexCluster{
 				Spec: infrav1.YandexClusterSpec{
-					ControlPlaneEndpoint: &clusterv1.APIEndpoint{},
+					ControlPlaneEndpoint: clusterv1.APIEndpoint{},
 				},
 			},
 			wantErr: false,

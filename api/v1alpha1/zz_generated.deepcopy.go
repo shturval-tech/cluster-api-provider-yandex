@@ -24,7 +24,6 @@ import (
 	"k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/cluster-api/api/core/v1beta1"
-	"sigs.k8s.io/cluster-api/api/core/v1beta2"
 	"sigs.k8s.io/cluster-api/errors"
 )
 
@@ -292,11 +291,7 @@ func (in *YandexClusterList) DeepCopyObject() runtime.Object {
 func (in *YandexClusterSpec) DeepCopyInto(out *YandexClusterSpec) {
 	*out = *in
 	out.NetworkSpec = in.NetworkSpec
-	if in.ControlPlaneEndpoint != nil {
-		in, out := &in.ControlPlaneEndpoint, &out.ControlPlaneEndpoint
-		*out = new(v1beta2.APIEndpoint)
-		**out = **in
-	}
+	out.ControlPlaneEndpoint = in.ControlPlaneEndpoint
 	in.LoadBalancer.DeepCopyInto(&out.LoadBalancer)
 	if in.Labels != nil {
 		in, out := &in.Labels, &out.Labels

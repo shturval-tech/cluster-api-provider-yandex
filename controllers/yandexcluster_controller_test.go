@@ -228,7 +228,7 @@ var _ = Describe("YandexCluster reconciliation check", func() {
 				return (err == nil && yc.Status.Ready)
 			}, e.eventuallyTimeout).Should(BeTrue())
 
-			Expect(yc.Spec.ControlPlaneEndpoint).NotTo(BeNil())
+			Expect(yc.Spec.ControlPlaneEndpoint.IsZero()).To(BeFalse())
 			Expect(yc.Spec.ControlPlaneEndpoint.Host).To(Equal(ip))
 			Expect(yc.Spec.ControlPlaneEndpoint.Port).To(Equal(int32(8443)))
 			Expect(yc.Status.LoadBalancer.ListenerAddress).To(Equal(ip))
@@ -409,7 +409,7 @@ var _ = Describe("YandexCluster reconciliation check", func() {
 			Expect(e.Create(ctx, cc)).To(Succeed())
 			yc := e.getYandexClusterWithOwnerReference(testNamespace.Name)
 			controlPlaneEndpointIP := "1.1.1.1"
-			yc.Spec.ControlPlaneEndpoint = &clusterv1.APIEndpoint{
+			yc.Spec.ControlPlaneEndpoint = clusterv1.APIEndpoint{
 				Host: controlPlaneEndpointIP,
 				Port: 8443,
 			}
@@ -483,7 +483,7 @@ var _ = Describe("YandexCluster reconciliation check", func() {
 			yc := e.getYandexClusterWithOwnerReference(testNamespace.Name)
 			controlPlaneEndpointIP := "1.2.3.4"
 			ip := "1.2.3.4"
-			yc.Spec.ControlPlaneEndpoint = &clusterv1.APIEndpoint{
+			yc.Spec.ControlPlaneEndpoint = clusterv1.APIEndpoint{
 				Host: controlPlaneEndpointIP,
 				Port: 8443,
 			}

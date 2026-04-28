@@ -59,7 +59,7 @@ type YandexClusterSpec struct {
 	// Do not set it manually when creating YandexCluster as CAPY will set this for you
 	// after creating load balancer based on LoadBalancer specification.
 	// +optional
-	ControlPlaneEndpoint *clusterv1.APIEndpoint `json:"controlPlaneEndpoint,omitempty"`
+	ControlPlaneEndpoint clusterv1.APIEndpoint `json:"controlPlaneEndpoint,omitempty,omitzero"`
 
 	// FolderID is the identifier of YandexCloud folder to deploy the cluster to.
 	// +required
